@@ -19,13 +19,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import fr.mastersid.barre.stackoverflow.data.Question
 import fr.mastersid.barre.stackoverflow.QuestionListModel
-
 import fr.mastersid.barre.stackoverflow.databinding.FragmentQuestionListBinding
 import fr.mastersid.barre.stackoverflow.repository.QuestionRepository
-import java.lang.Exception
-import kotlin.math.log
 
 
 /**
@@ -47,41 +43,38 @@ class QuestionListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val smsManager = SmsManager . getDefault ()
-        val message="test reussie"
-
         super.onViewCreated(view, savedInstanceState)
-        val requestPermissionLauncher =
-            registerForActivityResult (
-                ActivityResultContracts . RequestPermission ()
-            ) { isGranted : Boolean ->
-                if ( isGranted ) {
-                    smsManager . sendTextMessage ("0781597937", null , message , null , null )
-                } else {
-                    Snackbar . make (
-                        _binding.recyclerView ,
-                        "Permission needed",
-                        Snackbar.LENGTH_LONG
-                    ). setAction ("Go to settings") {
-                        startActivity (
-                            Intent (
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS ,
-                                Uri.parse ("package:"+requireActivity().packageName)
-                            )
-                        )
-                    }. show ()
 
-// permission refus ´ee (8b)
-                }
+        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts . RequestPermission ()) {
+                isGranted : Boolean ->
+            if ( isGranted ) {
+                //smsManager.sendTextMessage ("0781597937", null , "hehe" , null , null )
+            } else {
+                Snackbar . make (
+                    _binding.recyclerView ,
+                    "Permission needed",
+                    Snackbar.LENGTH_LONG
+                ). setAction ("Go to settings") {
+                    startActivity (
+                        Intent (
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS ,
+                            Uri.parse ("package:"+requireActivity().packageName)
+                        )
+                    )
+                }. show ()
             }
+        }
         val questionListAdapter = QuestionListAdapter(
             listener = {
                 when {
+
                     ContextCompat . checkSelfPermission (
                         requireContext () ,
                         Manifest . permission.SEND_SMS
                     ) == PackageManager.PERMISSION_GRANTED
                     -> {
-                        smsManager.sendTextMessage ("0781597937", null , message , null , null )
+
+                        smsManager.sendTextMessage ("0781597937", null ,it.title , null , null )
                     }
                     shouldShowRequestPermissionRationale (
                         Manifest.permission.SEND_SMS
@@ -102,6 +95,7 @@ class QuestionListFragment : Fragment() {
                     }
                 }
             }
+
         )
         _binding.recyclerView.apply {
             setHasFixedSize(true)
